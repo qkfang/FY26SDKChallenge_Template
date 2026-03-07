@@ -46,12 +46,13 @@ $sqlEndpoint = $envVars.sqlServerEndpoint
 $sqlDatabase = $envVars.sqlDatabaseName
 
 if ($sqlEndpoint -and $sqlDatabase) {
-    $sqlprojDir  = ".\workspace\SalesSQL.SQLDatabase"
-    $sqlprojFile = "$sqlprojDir\SalesSQL.sqlproj"
-    $dacpacPath  = "$sqlprojDir\bin\SalesSQL.dacpac"
+    $sqlprojDir  = Join-Path $PSScriptRoot "workspace" "SalesSQL.SQLDatabase"
+    $sqlprojFile = Join-Path $sqlprojDir "SalesSQL.sqlproj"
+    $binDir      = Join-Path $sqlprojDir "bin"
+    $dacpacPath  = Join-Path $binDir "SalesSQL.dacpac"
 
     Write-Host "Building SQL project..."
-    dotnet build $sqlprojFile --output "$sqlprojDir\bin" --nologo -v quiet
+    dotnet build $sqlprojFile --output $binDir --nologo -v quiet
     if ($LASTEXITCODE -ne 0) { Write-Error "SQL project build failed."; exit 1 }
 
     $connStr = "Server=$sqlEndpoint,1433;Initial Catalog=$sqlDatabase;" +
@@ -63,7 +64,8 @@ if ($sqlEndpoint -and $sqlDatabase) {
     if (-not $sqlpkg) {
         Write-Host "sqlpackage not found, installing via dotnet global tool..."
         dotnet tool install -g microsoft.sqlpackage
-        $env:PATH += ";$env:USERPROFILE\.dotnet\tools"
+        $dotnetToolsPath = Join-Path $HOME ".dotnet" "tools"
+        $env:PATH += [System.IO.Path]::PathSeparator + $dotnetToolsPath
         $sqlpkg = Get-Command sqlpackage -ErrorAction SilentlyContinue
         if (-not $sqlpkg) { Write-Error "sqlpackage installation failed."; exit 1 }
     }
