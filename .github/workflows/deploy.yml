@@ -80,9 +80,9 @@ jobs:
       - name: Deploy Fabric Items & SQL (QA)
         shell: pwsh
         env:
-          TENANTID: ${{ secrets.FABRIC_TENANT_ID }}
-          CLIENTID: ${{ secrets.FABRIC_CLIENT_ID }}
-          CLIENTSECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
+          TENANTID: ${{ secrets.TENANTID }}
+          CLIENTID: ${{ secrets.CLIENTID }}
+          CLIENTSECRET: ${{ secrets.CLIENTSECRET }}
         run: ./deploy-fabric.ps1 -Environment QA
 
   # ── Deploy to PROD ─────────────────────────────────────────────────────────

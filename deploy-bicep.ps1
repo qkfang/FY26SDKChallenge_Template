@@ -33,33 +33,11 @@ if (-not $rgExists) {
     Write-Host "Resource group '$ResourceGroup' already exists."
 }
 
-# ── Hardcoded signed-in user info (avoids az ad signed-in-user show in CI) ───
-$adminObjectId = "4b74544b-02c6-4e4f-b936-732c9c3fff65"
-$adminUpn      = "danielfang@MngEnvMCAP951655.onmicrosoft.com"
-
-# ── Auto-detect AAD admin for SQL Server if not set ──────────────────────────
-if (-not $env:SQL_AAD_ADMIN_NAME -or -not $env:SQL_AAD_ADMIN_OBJECT_ID) {
-    $env:SQL_AAD_ADMIN_NAME = $adminUpn
-    $env:SQL_AAD_ADMIN_OBJECT_ID = $adminObjectId
-    Write-Host "  SQL AAD Admin: $($env:SQL_AAD_ADMIN_NAME) ($($env:SQL_AAD_ADMIN_OBJECT_ID))"
-}
-
-# ── Auto-detect capacity admin ────────────────────────────────────────────────
-$capacityAdmin = if ($env:FABRIC_CAPACITY_ADMIN_ID) { $env:FABRIC_CAPACITY_ADMIN_ID } else { $adminUpn }
-Write-Host "  Capacity Admin: $capacityAdmin"
-
 # ── Deploy Bicep template ─────────────────────────────────────────────────────
-Write-Host "Deploying Bicep template '$TemplateFile' to '$ResourceGroup'..."
-$adminArray = ConvertTo-Json @($capacityAdmin) -Compress
-if ($env:OS -eq 'Windows_NT') {
-    # Windows shell strips embedded quotes; backslash-escape so az CLI receives valid JSON
-    $adminArray = $adminArray -replace '"', '\"'
-}
 $rawOutput = az deployment group create `
     --resource-group $ResourceGroup `
     --template-file $TemplateFile `
     --parameters $ParameterFile `
-    --parameters capacityAdminMembers="$adminArray" `
     --only-show-errors `
     --output json 2>&1
 
@@ -84,4 +62,4 @@ if (-not $variableConfig.$Environment) {
 $variableConfig.$Environment | Add-Member -NotePropertyName "capacityId"   -NotePropertyValue $outputs.capacityId.value   -Force
 $variableConfig.$Environment | Add-Member -NotePropertyName "capacityName" -NotePropertyValue $outputs.capacityName.value -Force
 $variableConfig | ConvertTo-Json -Depth 3 | Set-Content $variableFile
-Write-Host "config/variable.json updated for $Environment."
+Write-Host "config/variable.json updated"
