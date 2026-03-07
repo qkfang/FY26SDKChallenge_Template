@@ -54,21 +54,27 @@
         }
       }
     },
-    "title": {
-      "show": {
-        "expr": {
-          "Literal": {
-            "Value": "true"
+"vcObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Revenue by Category'"
+                }
+              }
+            }
           }
         }
-      },
-      "text": {
-        "expr": {
-          "Literal": {
-            "Value": "'Revenue by Category'"
-          }
-        }
-      }
+      ]
     },
     "drillFilterOtherVisuals": true
   }
