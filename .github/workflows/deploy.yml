@@ -1,0 +1,137 @@
+name: Deploy Fabric Workspace
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to deploy (QA, PROD, or ALL)"
+        required: true
+        default: "ALL"
+        type: choice
+        options:
+          - QA
+          - PROD
+          - ALL
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  # ── Validate repository structure ──────────────────────────────────────────
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Validate repo
+        run: python deploy/validate_repo.py
+
+  # ── Deploy to QA ───────────────────────────────────────────────────────────
+  deploy-qa:
+    name: Deploy to QA
+    needs: validate
+    if: >-
+      github.event_name == 'push' ||
+      github.event.inputs.environment == 'QA' ||
+      github.event.inputs.environment == 'ALL'
+    runs-on: ubuntu-latest
+    environment: QA
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Deploy Bicep (QA)
+        shell: pwsh
+        run: ./deploy-bicep.ps1 -Environment QA -ResourceGroup ${{ vars.RESOURCE_GROUP || 'rg-fabricsdk' }} -Location ${{ vars.LOCATION || 'australiaeast' }}
+
+      - name: Deploy CLI - Create Workspaces (QA)
+        shell: pwsh
+        run: ./deploy-cli.ps1 -Environment QA
+
+      - name: Deploy Fabric Items & SQL (QA)
+        shell: pwsh
+        env:
+          TENANTID: ${{ secrets.FABRIC_TENANT_ID }}
+          CLIENTID: ${{ secrets.FABRIC_CLIENT_ID }}
+          CLIENTSECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
+        run: ./deploy-fabric.ps1 -Environment QA
+
+  # ── Deploy to PROD ─────────────────────────────────────────────────────────
+  deploy-prod:
+    name: Deploy to PROD
+    needs: deploy-qa
+    if: >-
+      github.event_name == 'push' ||
+      github.event.inputs.environment == 'PROD' ||
+      github.event.inputs.environment == 'ALL'
+    runs-on: ubuntu-latest
+    environment: PROD
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Deploy Bicep (PROD)
+        shell: pwsh
+        run: ./deploy-bicep.ps1 -Environment PROD -ResourceGroup ${{ vars.RESOURCE_GROUP || 'rg-fabricsdk' }} -Location ${{ vars.LOCATION || 'australiaeast' }}
+
+      - name: Deploy CLI - Create Workspaces (PROD)
+        shell: pwsh
+        run: ./deploy-cli.ps1 -Environment PROD
+
+      - name: Deploy Fabric Items & SQL (PROD)
+        shell: pwsh
+        env:
+          TENANTID: ${{ secrets.FABRIC_TENANT_ID }}
+          CLIENTID: ${{ secrets.FABRIC_CLIENT_ID }}
+          CLIENTSECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
+        run: ./deploy-fabric.ps1 -Environment PROD
