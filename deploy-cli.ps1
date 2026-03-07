@@ -42,7 +42,7 @@ Write-Host "Fabric Capacity ID (GUID): $capacityId"
 
 $spObjectId    = "a6efe236-83c5-472b-a068-65006e369ad7"
 $spDisplayName = "sp-demo-01"
-$sqlDbDisplayName = "fabricdb"
+$sqlDbDisplayName = "SalesSQL"
 $workspaceIds  = @{}
 
 function New-FabricWorkspace {

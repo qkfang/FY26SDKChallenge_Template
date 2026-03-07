@@ -21,3 +21,5 @@ ref table Customer
 ref table SalesOrderHeader
 
 ref table SalesOrderDetail
+
+ref table _Measures

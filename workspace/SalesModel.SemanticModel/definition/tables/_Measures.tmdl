@@ -1,0 +1,33 @@
+table _Measures
+	lineageTag: m0000001-0000-0000-0000-000000000001
+
+	measure 'Total Revenue' = SUM(SalesOrderDetail[LineTotal])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: m0000001-0000-0000-0000-000000000002
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'Total Orders' = DISTINCTCOUNT(SalesOrderHeader[SalesOrderID])
+		formatString: #,0
+		lineageTag: m0000001-0000-0000-0000-000000000003
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'Avg Order Value' = DIVIDE([Total Revenue], [Total Orders])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: m0000001-0000-0000-0000-000000000004
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'Total Customers' = DISTINCTCOUNT(Customer[CustomerID])
+		formatString: #,0
+		lineageTag: m0000001-0000-0000-0000-000000000005
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'Total Units Sold' = SUM(SalesOrderDetail[OrderQty])
+		formatString: #,0
+		lineageTag: m0000001-0000-0000-0000-000000000006
+
+		annotation SummarizationSetBy = Automatic
+

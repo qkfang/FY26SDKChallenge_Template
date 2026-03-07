@@ -14,7 +14,7 @@ param aadAdminName string
 param aadAdminObjectId string
 
 @description('Name of the default database.')
-param databaseName string = 'fabricdb'
+param databaseName string = 'SalesSQL'
 
 @description('SQL Database SKU name.')
 param databaseSkuName string = 'Basic'
