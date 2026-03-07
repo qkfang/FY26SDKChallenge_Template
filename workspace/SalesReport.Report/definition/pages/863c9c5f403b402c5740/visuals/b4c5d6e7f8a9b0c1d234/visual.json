@@ -1,15 +1,15 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
-  "name": "81ccad520580c297ada4",
+  "name": "b4c5d6e7f8a9b0c1d234",
   "position": {
-    "x": 20,
+    "x": 860,
     "y": 80,
     "z": 0,
     "height": 260,
-    "width": 380
+    "width": 400
   },
   "visual": {
-    "visualType": "clusteredBarChart",
+    "visualType": "clusteredColumnChart",
     "query": {
       "queryState": {
         "Category": {
@@ -19,13 +19,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "ProductCategory"
+                      "Entity": "SalesOrderHeader"
                     }
                   },
-                  "Property": "Name"
+                  "Property": "SalesTerritory"
                 }
               },
-              "queryRef": "ProductCategory.Name"
+              "queryRef": "SalesOrderHeader.SalesTerritory"
             }
           ]
         },
@@ -38,17 +38,17 @@
                     "Column": {
                       "Expression": {
                         "SourceRef": {
-                          "Entity": "SalesOrderDetail"
+                          "Entity": "SalesOrderHeader"
                         }
                       },
-                      "Property": "LineTotal"
+                      "Property": "SubTotal"
                     }
                   },
                   "Function": 0
                 }
               },
-              "queryRef": "Sum(SalesOrderDetail.LineTotal)",
-              "nativeQueryRef": "Sum of LineTotal"
+              "queryRef": "Sum(SalesOrderHeader.SubTotal)",
+              "nativeQueryRef": "Sum of SubTotal"
             }
           ]
         }
@@ -65,7 +65,7 @@
       "text": {
         "expr": {
           "Literal": {
-            "Value": "'Revenue by Category'"
+            "Value": "'Revenue by Territory'"
           }
         }
       }

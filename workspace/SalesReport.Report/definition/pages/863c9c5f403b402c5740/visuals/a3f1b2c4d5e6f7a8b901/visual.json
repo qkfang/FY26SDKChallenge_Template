@@ -1,15 +1,15 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
-  "name": "81ccad520580c297ada4",
+  "name": "a3f1b2c4d5e6f7a8b901",
   "position": {
-    "x": 20,
+    "x": 420,
     "y": 80,
     "z": 0,
     "height": 260,
-    "width": 380
+    "width": 420
   },
   "visual": {
-    "visualType": "clusteredBarChart",
+    "visualType": "lineChart",
     "query": {
       "queryState": {
         "Category": {
@@ -19,13 +19,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "ProductCategory"
+                      "Entity": "SalesOrderHeader"
                     }
                   },
-                  "Property": "Name"
+                  "Property": "OrderDate"
                 }
               },
-              "queryRef": "ProductCategory.Name"
+              "queryRef": "SalesOrderHeader.OrderDate"
             }
           ]
         },
@@ -38,17 +38,17 @@
                     "Column": {
                       "Expression": {
                         "SourceRef": {
-                          "Entity": "SalesOrderDetail"
+                          "Entity": "SalesOrderHeader"
                         }
                       },
-                      "Property": "LineTotal"
+                      "Property": "TotalDue"
                     }
                   },
                   "Function": 0
                 }
               },
-              "queryRef": "Sum(SalesOrderDetail.LineTotal)",
-              "nativeQueryRef": "Sum of LineTotal"
+              "queryRef": "Sum(SalesOrderHeader.TotalDue)",
+              "nativeQueryRef": "Sum of TotalDue"
             }
           ]
         }
@@ -65,7 +65,7 @@
       "text": {
         "expr": {
           "Literal": {
-            "Value": "'Revenue by Category'"
+            "Value": "'Monthly Sales Trend'"
           }
         }
       }
